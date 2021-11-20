@@ -3,7 +3,7 @@
 python training/train.py \
 --data "training/output.dan" \
 --logging_steps 50 \
---max_steps 30000 \
+--max_steps 20000 \
 --evaluation_strategy steps \
 --save_strategy steps \
 --eval_steps 500 \
@@ -20,4 +20,4 @@ python training/train.py \
 --masking_type rand_span \
 --deep_transformer_stack_layers 12 \
 --per_device_eval_batch_size 12 \
---per_device_train_batch_size 12
+--per_device_train_batch_size 16
