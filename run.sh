@@ -12,7 +12,7 @@ python training/train.py \
 --dropout 0.1 \
 --weight_decay 0.01  \
 --output_dir "training/models/first" \
---overwrite_output_dir : True \
+--overwrite_output_dir True \
 --masking_type rand_span \
 --gradient_accumulation_steps 6 \
 --masking_type rand_span \
