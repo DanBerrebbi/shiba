@@ -12,8 +12,9 @@ python training/train.py \
 --dropout 0.1 \
 --weight_decay 0.01  \
 --output_dir "training/models/first" \
+--overwrite_output_dir : True \
 --masking_type rand_span \
---gradient_accumulation_steps 12 \
+--gradient_accumulation_steps 6 \
 --masking_type rand_span \
 --deep_transformer_stack_layers 12 \
 --per_device_eval_batch_size 4 \
