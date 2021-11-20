@@ -1,7 +1,7 @@
 python training/train.py \
 --data "training/output.dan" \
 --logging_steps 50 \
---max_steps 6000 \
+--max_steps 30000 \
 --evaluation_strategy steps \
 --save_strategy steps \
 --eval_steps 500 \
@@ -11,9 +11,9 @@ python training/train.py \
 --adam_epsilon 1e-06 \
 --dropout 0.1 \
 --weight_decay 0.01  \
---output_dir ~/runs/pretrained_shiba \
+--output_dir "training/models/first" \
 --masking_type rand_span \
---gradient_accumulation_steps 6 \
+--gradient_accumulation_steps 12 \
 --masking_type rand_span \
 --deep_transformer_stack_layers 12 \
 --per_device_eval_batch_size 4 \
