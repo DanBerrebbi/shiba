@@ -7,8 +7,8 @@ from transformers import HfArgumentParser, Trainer
 from helpers import MAX_JP_CODEPOINT, DataArguments, prepare_data, \
     ShibaTrainingArguments, get_model_hyperparams
 from masking import RandomSpanMaskingDataCollator, RandomMaskingDataCollator
-from shiba import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer
-
+#from shiba import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer changer ca
+from shiba.model import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer
 
 def main():
     transformers.logging.set_verbosity_info()
@@ -45,6 +45,7 @@ def main():
     os.environ['WANDB_PROJECT'] = 'shiba'
 
     print(training_args)
+
     trainer = Trainer(model=model,
                       args=training_args,
                       data_collator=data_collator,

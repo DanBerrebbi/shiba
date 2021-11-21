@@ -370,8 +370,8 @@ class ShibaForMaskedLanguageModeling(ShibaForTask):
             prediction_target_ids = self._replace_unkown_tokens(labels.gather(1, predict_indices))
             loss = self.loss(char_probs.transpose(1, 2), prediction_target_ids).mean() # https://github.com/microsoft/DeepSpeed/issues/962
             output['loss'] = loss
-        assert 5 == 9
-        return output.get('loss', None) /0 , output['char_probs'], output['embeddings']
+
+        return output.get('loss', None), output['char_probs'], output['embeddings']
 
     def forward(self, input_ids: torch.Tensor, labels: Optional[torch.Tensor],
                 attention_mask: torch.Tensor,
