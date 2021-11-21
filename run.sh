@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-masking=bpe_span  # masking is rand_span or bpe_span or rand_char
+masking=rand_span  # masking is rand_span or bpe_span or rand_char
 echo $masking
 
 python training/train.py \
