@@ -274,6 +274,56 @@ class RandomSpanMaskingDataCollator:
         return padded_batch
 
 
+
+class RandomSpanMaskingDataCollatorContrastive:
+    tokenizer_vocab_loc = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bpe_vocab.json')
+    special_tokens = SPECIAL_TOKENS_WITHOUT_PADDING | {CodepointTokenizer.PAD}
+
+    def __init__(self, tokenizer: CodepointTokenizer, bpe_span_selection: bool):
+        self.tokenizer = tokenizer
+        self.jp_tokenizer = Tokenizer.from_file(self.tokenizer_vocab_loc)
+        self.jp_vocab = self.jp_tokenizer.get_vocab()
+        self.wp_by_length = self._compute_subword_vocab()
+        self.bpe_span_selection = bpe_span_selection
+
+    def _compute_subword_vocab(self) -> Dict[int, List[str]]:
+        word_pieces = [wp.strip('#') for wp in self.jp_vocab if wp not in self.special_tokens and not wp.isdigit()]
+        word_pieces_by_length = defaultdict(list)
+        for wp in word_pieces:
+            word_pieces_by_length[len(wp)].append(wp)
+
+        return word_pieces_by_length
+
+    def __call__(self, batch) -> Dict[str, torch.Tensor]:
+        padded_batch = self.tokenizer.pad([x['input_ids'] for x in batch])
+        if False and self.bpe_span_selection:
+            input_ids, labels, masked_indices = bpe_span_mask(padded_batch['input_ids'],
+                                                              padded_batch['attention_mask'],
+                                                              replacement_vocab=self.wp_by_length,
+                                                              bpe_tokenizer=self.jp_tokenizer)
+
+        else:
+            input_ids1, labels1, masked_indices1 = random_span_mask(padded_batch['input_ids'],
+                                                                 padded_batch['attention_mask'],
+                                                                 replacement_vocab=self.wp_by_length)
+
+            input_ids2, labels2, masked_indices2 = random_span_mask(padded_batch['input_ids'],
+                                                                    padded_batch['attention_mask'],
+                                                                    replacement_vocab=self.wp_by_length)
+
+        padded_batch.update({
+            'input_ids1': input_ids1,
+            'labels1': labels1,
+            'predict_indices1': masked_indices1,
+            'input_ids2': input_ids2,
+            'labels2': labels2,
+            'predict_indices2': masked_indices2
+        })
+
+        return padded_batch
+
+
+
 class RandomMaskingDataCollator:
     def __init__(self, tokenizer: CodepointTokenizer, replacement_range: range):
         self.tokenizer = tokenizer
