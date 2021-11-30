@@ -156,7 +156,7 @@ def bpe_span_mask(input_ids: torch.Tensor, attention_mask: torch.Tensor, replace
 
 
 def random_span_mask(input_ids: torch.Tensor, attention_mask: torch.Tensor, replacement_vocab: Dict[int, List[str]],
-                     masking_percent: float = 0.15, span_length: int = 2) -> Tuple[
+                     masking_percent: float = 0.25, span_length: int = 2) -> Tuple[
     torch.Tensor, torch.Tensor, torch.Tensor]:
     """randomly mask spans, and replace some of the spans with same length subwords. note that character-trained canine
     only does masking (no replacement) for some reason, so this is slightly different to what we're doing"""
