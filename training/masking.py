@@ -308,9 +308,9 @@ class RandomSpanMaskingDataCollatorContrastive:
         #padded_batch.update({'input_ids': [input_ids1, input_ids2] , 'labels': [labels1, labels2], 'predict_indices': [masked_indices1, masked_indices2]})
 
         padded_batch.update({
-            'input_ids': input_ids1,
-            'labels': labels1,
-            'predict_indices': masked_indices1
+            'input_ids': [input_ids1, input_ids2],
+            'labels': [labels1, labels2],
+            'predict_indices': [masked_indices1,masked_indices2]
         })
 
         return padded_batch
