@@ -428,9 +428,9 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
                 attention_mask: torch.Tensor,
                 predict_indices: torch.Tensor) -> Tuple:
 
-        input_ids1, input_ids2 = input_ids[0], input_ids[1]
-        predict_indices1, predict_indices2 = predict_indices[0], predict_indices[1]
-        labels1, labels2 = labels[0], labels[1]
+        input_ids1, input_ids2 = input_ids[0].to("cuda"), input_ids[1].to("cuda")
+        predict_indices1, predict_indices2 = predict_indices[0].to("cuda"), predict_indices[1].to("cuda")
+        labels1, labels2 = labels[0].to("cuda"), labels[1].to("cuda")
 
         output_for_predictions1 = self.shiba_model(input_ids1, attention_mask, predict_indices1)['embeddings']
         output_for_predictions2 = self.shiba_model(input_ids2, attention_mask, predict_indices2)['embeddings']
