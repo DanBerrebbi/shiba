@@ -41,7 +41,7 @@ def random_mask(input_ids: torch.Tensor, attention_mask: torch.tensor,
     input_ids = input_ids.clone()
     special_tokens_mask = _special_tokens_mask_from_range(input_ids, range(MIN_SPECIAL_TOKEN, MAX_SPECIAL_TOKEN))
     special_tokens_mask = special_tokens_mask | attention_mask.bool()
-    mask_count = math.floor(input_ids.shape[1] * masking_percent)
+    mask_count = math.floor(input_ids.shape[1] * masking_percent)   # ca ca va etre le nb de mask dans par phrase, en character
 
     indices_to_mask = []
     for unmaskable_indices, inputs in zip(special_tokens_mask, input_ids):
