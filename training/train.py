@@ -6,9 +6,10 @@ from transformers import HfArgumentParser, Trainer
 
 from helpers import MAX_JP_CODEPOINT, DataArguments, prepare_data, \
     ShibaTrainingArguments, get_model_hyperparams
-from masking import RandomSpanMaskingDataCollator, RandomMaskingDataCollator,RandomSpanMaskingDataCollatorContrastive
-#from shiba import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer changer ca
-from shiba.model import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer, ShibaForAutoregressiveLanguageModelingContrastive
+from masking import RandomSpanMaskingDataCollator, RandomMaskingDataCollator, RandomSpanMaskingDataCollatorContrastive
+import model2 as m
+from model2 import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer, ShibaForAutoregressiveLanguageModelingContrastive
+
 
 def main():
     transformers.logging.set_verbosity_info()
@@ -67,21 +68,9 @@ def main_contrastive():
 
     data_args, training_args = parser.parse_args_into_dataclasses()
     tokenizer = CodepointTokenizer()
-    if training_args.masking_type == 'bpe_span':
-        print('BPE based-span masking')
-        data_collator = RandomSpanMaskingDataCollator(tokenizer, True)
-    elif training_args.masking_type == 'rand_span':
+    if training_args.masking_type == 'rand_span':
         print('Random span masking')
-        data_collator = RandomSpanMaskingDataCollator(tokenizer, False)
-    elif training_args.masking_type == 'rand_span_contrastive':
-        print('Random span masking contrastive version')
         data_collator = RandomSpanMaskingDataCollatorContrastive(tokenizer, False)
-
-    elif training_args.masking_type == 'rand_char':
-        print('Random character masking')
-        # char range: https://stackoverflow.com/a/30200250/4243650
-        # we aren't including half width stuff
-        data_collator = RandomSpanMaskingDataCollatorContrastive(tokenizer, range(3000, MAX_JP_CODEPOINT))
     else:
         raise RuntimeError('Unknown masking type')
 
@@ -89,7 +78,7 @@ def main_contrastive():
     training_data, dev_data = prepare_data(data_args)
     model_hyperparams = get_model_hyperparams(training_args)
 
-    model = ShibaForAutoregressiveLanguageModelingContrastive(MAX_JP_CODEPOINT, **model_hyperparams)
+    model = ShibaForAutoregressiveLanguageModeling(MAX_JP_CODEPOINT, **model_hyperparams)
 
     checkpoint_dir = None
     if training_args.resume_from_checkpoint:

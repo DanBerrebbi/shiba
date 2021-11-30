@@ -296,28 +296,21 @@ class RandomSpanMaskingDataCollatorContrastive:
 
     def __call__(self, batch) -> Dict[str, torch.Tensor]:
         padded_batch = self.tokenizer.pad([x['input_ids'] for x in batch])
-        if False and self.bpe_span_selection:
-            input_ids, labels, masked_indices = bpe_span_mask(padded_batch['input_ids'],
-                                                              padded_batch['attention_mask'],
-                                                              replacement_vocab=self.wp_by_length,
-                                                              bpe_tokenizer=self.jp_tokenizer)
 
-        else:
-            input_ids1, labels1, masked_indices1 = random_span_mask(padded_batch['input_ids'],
-                                                                 padded_batch['attention_mask'],
-                                                                 replacement_vocab=self.wp_by_length)
+        input_ids1, labels1, masked_indices1 = random_span_mask(padded_batch['input_ids'],
+                                                             padded_batch['attention_mask'],
+                                                             replacement_vocab=self.wp_by_length)
 
-            input_ids2, labels2, masked_indices2 = random_span_mask(padded_batch['input_ids'],
-                                                                    padded_batch['attention_mask'],
-                                                                    replacement_vocab=self.wp_by_length)
+        input_ids2, labels2, masked_indices2 = random_span_mask(padded_batch['input_ids'],
+                                                                padded_batch['attention_mask'],
+                                                                replacement_vocab=self.wp_by_length)
+
+        #padded_batch.update({'input_ids': [input_ids1, input_ids2] , 'labels': [labels1, labels2], 'predict_indices': [masked_indices1, masked_indices2]})
 
         padded_batch.update({
-            'input_ids1': input_ids1,
-            'labels1': labels1,
-            'predict_indices1': masked_indices1,
-            'input_ids2': input_ids2,
-            'labels2': labels2,
-            'predict_indices2': masked_indices2
+            'input_ids': input_ids1,
+            'labels': labels1,
+            'predict_indices': masked_indices1
         })
 
         return padded_batch
