@@ -78,7 +78,7 @@ def main_contrastive():
     training_data, dev_data = prepare_data(data_args)
     model_hyperparams = get_model_hyperparams(training_args)
 
-    model = ShibaForAutoregressiveLanguageModeling(MAX_JP_CODEPOINT, **model_hyperparams)
+    model = ShibaForAutoregressiveLanguageModelingContrastive(MAX_JP_CODEPOINT, **model_hyperparams)
 
     checkpoint_dir = None
     if training_args.resume_from_checkpoint:

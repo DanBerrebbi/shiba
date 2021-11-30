@@ -396,7 +396,6 @@ class ShibaForAutoregressiveLanguageModeling(ShibaForMaskedLanguageModeling):
                 attention_mask: torch.Tensor,
                 predict_indices: torch.Tensor) -> Tuple:
         output_for_predictions = self.shiba_model(input_ids, attention_mask, predict_indices)['embeddings']
-
         causal_mask = self._get_causal_mask(output_for_predictions)
 
         autoregressive_char_seq = self.autregressive_encoder(output_for_predictions.transpose(0, 1),
@@ -425,9 +424,14 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
                                                                                                    float(0.0))
         return causal_mask.to(output_for_predictions.device)
 
-    def forward(self, input_ids1: torch.Tensor, input_ids2: torch.Tensor, labels1: Optional[torch.Tensor], labels2: Optional[torch.Tensor],
+    def forward(self, input_ids: torch.Tensor, labels: Optional[torch.Tensor],
                 attention_mask: torch.Tensor,
-                predict_indices1: torch.Tensor, predict_indices2: torch.Tensor) -> Tuple:
+                predict_indices: torch.Tensor) -> Tuple:
+
+        input_ids1, input_ids2 = input_ids[0], input_ids[1]
+        predict_indices1, predict_indices2 = predict_indices[0], predict_indices[1]
+        labels1, labels2 = labels[0], labels[1]
+
         output_for_predictions1 = self.shiba_model(input_ids1, attention_mask, predict_indices1)['embeddings']
         output_for_predictions2 = self.shiba_model(input_ids2, attention_mask, predict_indices2)['embeddings']
 
