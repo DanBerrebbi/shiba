@@ -415,3 +415,45 @@ class ShibaForAutoregressiveLanguageModeling(ShibaForMaskedLanguageModeling):
                                                                       dim_feedforward=self.shiba_model.config.transformer_ff_size,
                                                                       dropout=self.shiba_model.config.dropout,
                                                                       activation=self.shiba_model.config.activation)
+
+
+class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageModeling):
+    def _get_causal_mask(self, output_for_predictions: torch.Tensor) -> torch.Tensor:
+        causal_mask = (torch.triu(torch.ones(output_for_predictions.shape[1],
+                                             output_for_predictions.shape[1])) == 1).transpose(0, 1)
+        causal_mask = causal_mask.float().masked_fill(causal_mask == 0, float('-inf')).masked_fill(causal_mask == 1,
+                                                                                                   float(0.0))
+        return causal_mask.to(output_for_predictions.device)
+
+    def forward(self, input_ids1: torch.Tensor, input_ids2: torch.Tensor, labels1: Optional[torch.Tensor], labels2: Optional[torch.Tensor],
+                attention_mask: torch.Tensor,
+                predict_indices1: torch.Tensor, predict_indices2: torch.Tensor) -> Tuple:
+        output_for_predictions1 = self.shiba_model(input_ids1, attention_mask, predict_indices1)['embeddings']
+        output_for_predictions2 = self.shiba_model(input_ids2, attention_mask, predict_indices2)['embeddings']
+
+        causal_mask1 = self._get_causal_mask(output_for_predictions1)
+        causal_mask2 = self._get_causal_mask(output_for_predictions2)
+
+        autoregressive_char_seq1 = self.autregressive_encoder(output_for_predictions1.transpose(0, 1),
+                                                             src_mask=causal_mask1).transpose(0, 1)
+        autoregressive_char_seq2 = self.autregressive_encoder(output_for_predictions2.transpose(0, 1),
+                                                              src_mask=causal_mask2).transpose(0, 1)
+
+        lm_hidden_states1 = self.lm_layer(autoregressive_char_seq1)
+        char_probs1 = self.log_softmax(lm_hidden_states1)
+        lm_hidden_states2 = self.lm_layer(autoregressive_char_seq2)
+        char_probs2 = self.log_softmax(lm_hidden_states2)
+
+        loss1, char1, embs1 =  self._compute_loss(output_for_predictions1, char_probs1, predict_indices1, labels1)
+        loss2, char2, embs2  = self._compute_loss(output_for_predictions2, char_probs2, predict_indices2, labels2)
+
+        return 0.5*(loss1+loss2), 0.5*(char1+char2), 0.5*(embs1+embs2)
+
+    def __init__(self, vocab_size: int, **kwargs):
+        super(ShibaForAutoregressiveLanguageModelingContrastive, self).__init__(vocab_size=vocab_size, **kwargs)
+
+        self.autregressive_encoder = torch.nn.TransformerEncoderLayer(self.shiba_model.config.hidden_size,
+                                                                      self.shiba_model.config.attention_heads,
+                                                                      dim_feedforward=self.shiba_model.config.transformer_ff_size,
+                                                                      dropout=self.shiba_model.config.dropout,
+                                                                      activation=self.shiba_model.config.activation)
