@@ -199,7 +199,7 @@ def random_span_mask(input_ids: torch.Tensor, attention_mask: torch.Tensor, repl
     spans_to_replace = torch.bernoulli(torch.full(span_start_locations.shape, 1.0)).bool()
 
     # 10% (half of the remaining 20%) of the time, we replace span input tokens with random word
-    #spans_to_randomize = torch.bernoulli(torch.full(span_start_locations.shape, 0.5)).bool() & ~spans_to_replace
+    spans_to_randomize = torch.bernoulli(torch.full(span_start_locations.shape, 0.0)).bool() & ~spans_to_replace
 
     for locs, replace, maskable_indices, row_idx in zip(span_start_locations, spans_to_replace,
                                                         maskable_indices_per_row, range(input_ids.shape[0])):
