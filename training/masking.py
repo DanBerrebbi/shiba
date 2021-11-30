@@ -306,11 +306,13 @@ class RandomSpanMaskingDataCollatorContrastive:
                                                                 replacement_vocab=self.wp_by_length)
 
         #padded_batch.update({'input_ids': [input_ids1, input_ids2] , 'labels': [labels1, labels2], 'predict_indices': [masked_indices1, masked_indices2]})
-
+        inputs = torch.nn.ModuleList([input_ids1, input_ids2])
+        labels =  torch.nn.ModuleList([labels1, labels2])
+        indices = torch.nn.ModuleList([masked_indices1,masked_indices2])
         padded_batch.update({
-            'input_ids': [input_ids1, input_ids2],
-            'labels': [labels1, labels2],
-            'predict_indices': [masked_indices1,masked_indices2]
+            'input_ids': inputs,
+            'labels': labels,
+            'predict_indices': indices
         })
 
         return padded_batch
