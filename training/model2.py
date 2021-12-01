@@ -368,6 +368,9 @@ class ShibaForMaskedLanguageModeling(ShibaForTask):
 
         if labels is not None:
             prediction_target_ids = self._replace_unkown_tokens(labels.gather(1, predict_indices))
+            print(char_probs.transpose(1, 2).shape)
+            print(prediction_target_ids.shape)
+            assert 6==5 , "{}   {}".format(char_probs.transpose(1, 2).shape, prediction_target_ids.shape)
             loss = self.loss(char_probs.transpose(1, 2), prediction_target_ids).mean() # https://github.com/microsoft/DeepSpeed/issues/962
             output['loss'] = loss
 
@@ -428,9 +431,13 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
                 attention_mask: torch.Tensor,
                 predict_indices: torch.Tensor) -> Tuple:
 
-        input_ids1, input_ids2 = input_ids[0].to("cuda"), input_ids[1].to("cuda")
-        predict_indices1, predict_indices2 = predict_indices[0].to("cuda"), predict_indices[1].to("cuda")
-        labels1, labels2 = labels[0].to("cuda"), labels[1].to("cuda")
+        #input_ids1, input_ids2 = input_ids[0].to("cuda"), input_ids[1].to("cuda")
+        #predict_indices1, predict_indices2 = predict_indices[0].to("cuda"), predict_indices[1].to("cuda")
+        #labels1, labels2 = labels[0].to("cuda"), labels[1].to("cuda")
+
+        input_ids1, input_ids2 = input_ids[0], input_ids[1]
+        predict_indices1, predict_indices2 = predict_indices[0], predict_indices[1]
+        labels1, labels2 = labels[0], labels[1]
 
         output_for_predictions1 = self.shiba_model(input_ids1, attention_mask, predict_indices1)['embeddings']
         output_for_predictions2 = self.shiba_model(input_ids2, attention_mask, predict_indices2)['embeddings']
