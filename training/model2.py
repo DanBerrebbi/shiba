@@ -457,7 +457,7 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
         lm_hidden_states2 = self.lm_layer(autoregressive_char_seq2)
         char_probs2 = self.log_softmax(lm_hidden_states2)
 
-        assert 3 == 4 , "{}  {}  {} {}  {}  {} {}  {}".format(output_for_predictions1.shape, output_for_predictions2.shape, char_probs1.shape, char_probs2.shape, predict_indices1.shape, predict_indices2.shape, labels1.shape, labels2.shape)
+        assert 3 == 4 , "{}  {}  {} {}  {}  {} {}  {}".format(output_for_predictions1.shape, output_for_predictions2.shape, char_probs1.shape, char_probs2.shape, predict_indices1.shape, predict_indices2.shape, labels1, labels2)
         loss1, char1, embs1 =  self._compute_loss(output_for_predictions1, char_probs1, predict_indices1, labels1)
         loss2, char2, embs2  = self._compute_loss(output_for_predictions2, char_probs2, predict_indices2, labels2)
 
