@@ -462,7 +462,12 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
         loss1, char1, embs1 =  self._compute_loss(output_for_predictions1, char_probs1, predict_indices1, labels1)
         loss2, char2, embs2  = self._compute_loss(output_for_predictions2, char_probs2, predict_indices2, labels2)
         bs = embs1.shape[0]
-        y = torch.ones((bs), dtype=torch.int)
+
+        if torch.cuda.is_available():
+            y = torch.ones((bs), dtype=torch.int, device="cuda")
+        else :
+            y = torch.ones((bs), dtype=torch.int)
+
         contrast_loss = self.contrastive_loss(embs1.reshape(bs, -1),embs2.reshape(bs, -1), y)
         alpha = 0.05
         return alpha*(0.5*(loss1+loss2)) + (1-alpha)*contrast_loss, 0.5*(char1+char2), 0.5*(embs1+embs2)
