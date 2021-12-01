@@ -354,6 +354,7 @@ class ShibaForMaskedLanguageModeling(ShibaForTask):
 
         self.log_softmax = torch.nn.LogSoftmax(dim=2)
         self.loss = torch.nn.NLLLoss(reduction="none")  # https://github.com/microsoft/DeepSpeed/issues/962
+        self.contrastive_loss = torch.nn.CosineEmbeddingLoss(margin=0.0, size_average=None, reduce=None, reduction='mean')
 
     def _replace_unkown_tokens(self, labels: torch.Tensor) -> torch.Tensor:
         return labels.where(labels < self.vocab_size, torch.full(labels.shape, self.unk_token,
@@ -368,11 +369,11 @@ class ShibaForMaskedLanguageModeling(ShibaForTask):
 
         if labels is not None:
             prediction_target_ids = self._replace_unkown_tokens(labels.gather(1, predict_indices))
-            print(char_probs.transpose(1, 2).shape)
-            print(prediction_target_ids.shape)
             loss = self.loss(char_probs.transpose(1, 2), prediction_target_ids).mean() # https://github.com/microsoft/DeepSpeed/issues/962
             print("loss : ", loss)
             output['loss'] = loss
+
+            # la je change je vais faire une loss uniquement baser sur les cosine
 
         return output.get('loss', None), output['char_probs'], output['embeddings']
 
@@ -460,8 +461,11 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
         #assert 3 == 4 , "{}  {}  {} {}  {}  {} {}  {}".format(output_for_predictions1.shape, output_for_predictions2.shape, char_probs1.shape, char_probs2.shape, predict_indices1.shape, predict_indices2.shape, labels1, labels2)
         loss1, char1, embs1 =  self._compute_loss(output_for_predictions1, char_probs1, predict_indices1, labels1)
         loss2, char2, embs2  = self._compute_loss(output_for_predictions2, char_probs2, predict_indices2, labels2)
-
-        return 0.5*(loss1+loss2), 0.5*(char1+char2), 0.5*(embs1+embs2)
+        bs = embs1.shape[0]
+        y = torch.ones((bs), dtype=torch.int)
+        contrast_loss = self.contrastive_loss(embs1.reshape(bs, -1),embs2.reshape(bs, -1), y)
+        alpha = 0.05
+        return alpha*(0.5*(loss1+loss2)) + (1-alpha)*contrast_loss, 0.5*(char1+char2), 0.5*(embs1+embs2)
 
     def __init__(self, vocab_size: int, **kwargs):
         super(ShibaForAutoregressiveLanguageModelingContrastive, self).__init__(vocab_size=vocab_size, **kwargs)
