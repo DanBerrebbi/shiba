@@ -470,7 +470,7 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
             y = torch.ones((bs), dtype=torch.int)
 
         contrast_loss = self.contrastive_loss(embs1.reshape(bs, -1),embs2.reshape(bs, -1), y)
-        alpha = 0.05
+        alpha = 0.5
         return alpha*(0.5*(loss1+loss2)) + (1-alpha)*contrast_loss, 0.5*(char1+char2), 0.5*(embs1+embs2)
 
     def __init__(self, vocab_size: int, **kwargs):
