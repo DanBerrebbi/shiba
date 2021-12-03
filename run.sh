@@ -24,5 +24,5 @@ python training/train.py \
 --deep_transformer_stack_layers 12 \
 --per_device_eval_batch_size 2 \
 --per_device_train_batch_size 4 \
-#--resume_from_checkpoint "/projects/tir5/users/dberrebb/CANINE/forked_shiba/shiba/training/models/first_rand_span/checkpoint-1500" \
+--resume_from_checkpoint "/projects/tir5/users/dberrebb/CANINE/forked_shiba/shiba/training/models/first_rand_span/checkpoint-1500" \
 

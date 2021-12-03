@@ -86,6 +86,7 @@ def main_contrastive():
             model.load_state_dict(torch.load(training_args.resume_from_checkpoint))
         else:
             checkpoint_dir = training_args.resume_from_checkpoint
+            assert 6 ==0
     os.environ['WANDB_PROJECT'] = 'shiba'
 
     print(training_args)
