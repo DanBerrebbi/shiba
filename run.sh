@@ -16,7 +16,7 @@ python training/train.py \
 --adam_epsilon 1e-06 \
 --dropout 0.1 \
 --weight_decay 0.01  \
---output_dir "training/models/contrastive_${masking}" \
+--output_dir "training/models/exp_contrast_alpha0.5" \
 --overwrite_output_dir False \
 --masking_type rand_span \
 --gradient_accumulation_steps 6 \
