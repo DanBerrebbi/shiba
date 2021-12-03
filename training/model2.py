@@ -5,6 +5,7 @@ import urllib
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Dict, Optional, Tuple
+from torch import linalg as LA
 
 import torch
 import numpy as np
@@ -463,7 +464,7 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
 
         #assert 3 == 4 , "{}  {}  {} {}  {}  {} {}  {}".format(output_for_predictions1.shape, output_for_predictions2.shape, char_probs1.shape, char_probs2.shape, predict_indices1.shape, predict_indices2.shape, labels1, labels2)
         loss1, char1, embs1 =  self._compute_loss(output_for_predictions1, char_probs1, predict_indices1, labels1)
-        loss2, char2, embs2  = self._compute_loss(output_for_predictions2, char_probs2, predict_indices2, labels2)
+       # loss2, char2, embs2  = self._compute_loss(output_for_predictions2, char_probs2, predict_indices2, labels2)
         bs = embs1.shape[0]
 
         if torch.cuda.is_available():
@@ -471,9 +472,11 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
         else :
             y = torch.ones((bs), dtype=torch.int)
 
-        contrast_loss = self.contrastive_loss(embs1.reshape(bs, -1),embs2.reshape(bs, -1), y)
+        #contrast_loss = self.contrastive_loss(embs1.reshape(bs, -1),embs2.reshape(bs, -1), y)
         alpha = 0.5
-        return alpha*(0.5*(loss1+loss2)) + (1-alpha)*contrast_loss, 0.5*(char1+char2), 0.5*(embs1+embs2)
+        beta=0.2
+        #return alpha*(0.5*(loss1+loss2)) + (1-alpha)*contrast_loss, 0.5*(char1+char2), 0.5*(embs1+embs2)
+        return loss1 + beta*LA.norm(embs1), char1, embs1
 
     def __init__(self, vocab_size: int, **kwargs):
         super(ShibaForAutoregressiveLanguageModelingContrastive, self).__init__(vocab_size=vocab_size, **kwargs)
