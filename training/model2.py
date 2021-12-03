@@ -326,9 +326,15 @@ class ShibaForClassification(ShibaForTask):
         self.log_softmax = torch.nn.LogSoftmax(dim=1)
         self.loss = torch.nn.NLLLoss()
 
-    def forward(self, input_ids: torch.Tensor, labels: Optional[torch.Tensor],
+    def forward(self,
+                input_ids: torch.Tensor,
+                segment_ids: Optional[torch.Tensor],
+                labels: Optional[torch.Tensor],
                 attention_mask: torch.Tensor) -> Tuple:
-        cls_embeddings = self.shiba_model(input_ids, attention_mask, None)['embeddings'][:, 0, :]
+        cls_embeddings = self.shiba_model(input_ids=input_ids,
+                                          segment_ids=segment_ids,
+                                          attention_mask=attention_mask,
+                                          predict_indices=None)['embeddings'][:, 0, :]
         class_hidden_states = self.label_layer(self.dropout(cls_embeddings))
         class_probs = self.log_softmax(class_hidden_states)
 
