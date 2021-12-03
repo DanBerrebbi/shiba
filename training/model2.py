@@ -7,6 +7,7 @@ from types import SimpleNamespace
 from typing import Dict, Optional, Tuple
 
 import torch
+import numpy as np
 
 from shiba.codepoint_tokenizer import CodepointTokenizer
 from shiba.local_transformer_encoder_layer import LocalTransformerEncoderLayer
@@ -370,8 +371,9 @@ class ShibaForMaskedLanguageModeling(ShibaForTask):
         if labels is not None:
             prediction_target_ids = self._replace_unkown_tokens(labels.gather(1, predict_indices))
             loss = self.loss(char_probs.transpose(1, 2), prediction_target_ids).mean() # https://github.com/microsoft/DeepSpeed/issues/962
-            print("loss : ", loss)
-            output['loss'] = loss
+            if np.random.random()>.95 :
+                print("loss : ", loss)
+                output['loss'] = loss
 
             # la je change je vais faire une loss uniquement baser sur les cosine
 
