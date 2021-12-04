@@ -7,7 +7,7 @@ python3 train_xnli.py \
 --max_steps 5000 \
 --evaluation_strategy steps \
 --save_strategy steps \
---eval_steps 50 \
+--eval_steps 25 \
 --save_steps 5000 \
 --learning_rate  0.1 \
 --adam_beta2 0.98 \
