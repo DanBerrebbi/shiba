@@ -45,7 +45,7 @@ class ContrastiveLossELI5(nn.Module):
             if self.verbose: print(f"sim({i}, {j})={sim_i_j}")
 
             numerator = torch.exp(sim_i_j / self.temperature)
-            one_for_not_i = torch.ones((2 * self.batch_size,)).to(emb_i.device).scatter_(0, torch.tensor([i]), 0.0)
+            one_for_not_i = torch.ones((2 * self.batch_size,)).to(emb_i.device).scatter_(0, torch.tensor([i],device=emb_i.device), 0.0)
             if self.verbose: print(f"1{{k!={i}}}", one_for_not_i)
 
             denominator = torch.sum(
