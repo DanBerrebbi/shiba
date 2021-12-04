@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-model="exp_simclr_alpha0.8_bs4_acc8"
+model="exp3"
 python3 train_xnli.py \
 --output_dir "XNLI_MODELS/${model}" \
---logging_steps 1000 \
---max_steps 100000 \
+--logging_steps 50 \
+--max_steps 5000 \
 --evaluation_strategy steps \
 --save_strategy steps \
---eval_steps 2000 \
+--eval_steps 50 \
 --save_steps 5000 \
---learning_rate  0.0004 \
+--learning_rate  0.1 \
 --adam_beta2 0.98 \
 --adam_epsilon 1e-06 \
 --dropout 0.1 \
