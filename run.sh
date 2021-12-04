@@ -16,7 +16,7 @@ python training/train.py \
 --adam_epsilon 1e-06 \
 --dropout 0.1 \
 --weight_decay 0.01  \
---output_dir "training/models/exp_reg_alpha0.2_bs4_acc8" \
+--output_dir "training/models/exp_simclr_alpha0.8_bs4_acc8" \
 --overwrite_output_dir False \
 --masking_type rand_span \
 --gradient_accumulation_steps 8 \
