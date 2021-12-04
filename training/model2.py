@@ -345,7 +345,7 @@ class ShibaForClassification(ShibaForTask):
                                           predict_indices=None)['embeddings'][:, 0, :]
         class_hidden_states = self.label_layer(self.dropout(cls_embeddings))
         #class_probs = self.log_softmax(class_hidden_states)
-        class_probs = torch.nn.functional.softmax(class_hidden_states, dim=-1)  # tester ca mais je crois que log_spftmax marche mieux de maniere generale
+        class_probs = torch.nn.functional.log_softmax(class_hidden_states, dim=-1)  # tester ca mais je crois que log_spftmax marche mieux de maniere generale
 
         output = {
             'cls_embeddings': cls_embeddings,
