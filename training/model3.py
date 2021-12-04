@@ -523,7 +523,7 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
         embs1_r, embs2_r = torch.reshape(embs1,(bs,-1)), torch.reshape(embs2,(bs,-1))
         simclr_loss = self.simclr(embs1_r,embs2_r)
 
-        alpha = 0.5
+        alpha = 0.
 
         return alpha*(0.5*(loss1+loss2)) + (1-alpha)*simclr_loss, 0.5*(char1+char2), 0.5*(embs1+embs2)
 
