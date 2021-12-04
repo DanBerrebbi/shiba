@@ -72,7 +72,26 @@ class ShibaClassificationArgs(ShibaTrainingArguments):
     logging_steps: Optional[int] = field(default=100)
     learning_rate: Optional[float] = 2e-5
     per_device_train_batch_size: Optional[int] = 6
-    num_train_epochs: Optional[int] = 6
+    num_train_epochs: Optional[int] = 10
+    save_strategy: Optional[str] = 'no'
+
+    # only used for hyperparameter search
+    trials: Optional[int] = field(default=2)
+    deepspeed: Optional = field(default=None)
+    gradient_accumulation_steps: Optional[int] = field(default=1)
+    report_to: Optional[List[str]] = field(default=lambda: ['tensorboard', 'wandb'])
+
+    pretrained_bert: Optional[str] = field(default=None)
+
+
+@dataclass
+class ShibaTyDiQAArgs(ShibaTrainingArguments):
+    do_predict: Optional[bool] = field(default=True)
+    eval_steps: Optional[int] = field(default=300)
+    logging_steps: Optional[int] = field(default=100)
+    learning_rate: Optional[float] = 2e-5
+    per_device_train_batch_size: Optional[int] = 6
+    num_train_epochs: Optional[int] = 10
     save_strategy: Optional[str] = 'no'
 
     # only used for hyperparameter search
@@ -129,6 +148,32 @@ class SequenceLabelingDataCollator:
         }
 
 
+class TyDiQADataCollator:
+    def __init__(self):
+        self.tokenizer = CodepointTokenizer()
+
+    def __call__(self, batch) -> Dict[str, torch.Tensor]:
+        input_ids = torch.tensor([x['input_ids'] for x in batch], dtype=torch.int)
+        # preprocessed results have 1 at valid tokens but pytorch transformers expect False at valid tokens
+        attention_mask = torch.tensor([x['attention_mask'] for x in batch]) != 1
+        segment_ids = torch.tensor([x['segment_ids'] for x in batch], dtype=torch.int)
+
+        answer_types = torch.tensor([x['answer_types'] for x in batch])
+        start_positions = torch.tensor([x['start_positions'] for x in batch])
+        end_positions = torch.tensor([x['end_positions'] for x in batch])
+
+        return {
+            'input_ids': input_ids,
+            'segment_ids': segment_ids,
+            'attention_mask': attention_mask,
+            'answer_types': answer_types,
+            'start_positions': start_positions,
+            'end_positions': end_positions
+        }
+
+
+
+
 class ClassificationDataCollator:
     def __init__(self):
         self.tokenizer = CodepointTokenizer()
@@ -137,11 +182,12 @@ class ClassificationDataCollator:
         padded_batch = self.tokenizer.pad([x['input_ids'] for x in batch])
         input_ids = padded_batch['input_ids']
         attention_mask = padded_batch['attention_mask']
-
+        segment_ids = self.tokenizer.pad([x['segment_ids'] for x in batch])['input_ids']
         labels = torch.tensor([x['labels'] for x in batch])
 
         return {
             'input_ids': input_ids,
             'attention_mask': attention_mask,
+            'segment_ids': segment_ids,
             'labels': labels
         }
