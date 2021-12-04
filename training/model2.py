@@ -76,6 +76,7 @@ class Shiba(torch.nn.Module):
 
         self.position_embedder = PositionEmbedder(max_length, hidden_size)
         self.embedder_ln = torch.nn.LayerNorm(hidden_size)
+        self.token_type_embedder = torch.nn.Embedding(3, hidden_size, padding_idx=0)
 
         # "Single Local Transformer"
         # note the CANINE paper says "local transformer", but it means "local transformer encoder" just like BERT
@@ -137,8 +138,8 @@ class Shiba(torch.nn.Module):
 
     def forward(self, input_ids: torch.Tensor,
                 attention_mask: torch.Tensor,
+                segment_ids: Optional[torch.Tensor] = None,
                 predict_indices: Optional[torch.Tensor] = None) -> Dict[str, torch.Tensor]:
-
         if input_ids.shape[1] > self.config.max_length:
             raise RuntimeError(f'Input tensor of shape {input_ids.shape} exceeded configured max length'
                                f'{self.config.max_length}')
@@ -146,10 +147,15 @@ class Shiba(torch.nn.Module):
         if any(input_ids[:, 0:1] != CodepointTokenizer.CLS):
             raise RuntimeError('All input sequences must start wit [CLS] codepoint')
 
-
         # https://github.com/google-research/language/blob/186ce9002180d0c45bfa2a680085b890c76647dc/language/canine/modeling.py#L221
         # https://github.com/google-research/language/blob/13dc35ccad77309354ff8ed2950c560c16b083b1/language/canine/bert_modeling.py#L448
-        char_embeddings = self.position_embedder(self.embedder(input_ids))
+        char_embeddings = self.embedder(input_ids)
+
+        if segment_ids is not None:
+            token_type_embeddings = self.token_type_embedder(segment_ids)
+            char_embeddings += token_type_embeddings
+
+        char_embeddings = self.position_embedder(char_embeddings)
 
         # https://github.com/google-research/language/blob/186ce9002180d0c45bfa2a680085b890c76647dc/language/canine/modeling.py#L253
         contextualized_chars = self.local_transformer(char_embeddings, attention_mask)  # h_init
@@ -184,7 +190,8 @@ class Shiba(torch.nn.Module):
             # TODO: if we switch out the deep transformer to something that calls its attention mask
             # anything other than "src_key_padding_mask" this will break
             contextualized_molecules = self.deep_transformer(molecules.transpose(0, 1),
-                                                        src_key_padding_mask=molecule_attention_mask).transpose(0, 1)  # h`_down
+                                                             src_key_padding_mask=molecule_attention_mask).transpose(0,
+                                                                                                                     1)  # h`_down
         else:
             contextualized_molecules = self.deep_transformer(molecules, src_key_padding_mask=molecule_attention_mask)
 
@@ -222,6 +229,7 @@ class Shiba(torch.nn.Module):
         return {
             'embeddings': final_embeddings
         }
+
 
     def _pad_to_avoid_missed_characters(self, char_embeddings: torch.Tensor) -> torch.Tensor:
         if char_embeddings.shape[1] % self.config.downsampling_rate == 0:
