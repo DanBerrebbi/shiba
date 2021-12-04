@@ -354,6 +354,7 @@ class ShibaForClassification(ShibaForTask):
 
         if labels is not None:
             output['loss'] = self.loss(class_probs, labels)
+            print(class_probs, labels, output['loss'])
 
         return output.get('loss', None), output['class_probs'], output['cls_embeddings']
 
