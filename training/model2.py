@@ -345,11 +345,11 @@ class ShibaForClassification(ShibaForTask):
             h = h.to("cuda")
 
             cls_embeddings1 = self.shiba_model(input_ids=p,
-                                              segment_ids=segment_ids,
+                                              segment_ids=segment_ids[0].to("cuda"),
                                               attention_mask=attention_mask,
                                               predict_indices=None)['embeddings'][:,0,:]
             cls_embeddings2 = self.shiba_model(input_ids=h,
-                                              segment_ids=segment_ids,
+                                              segment_ids=segment_ids[1].to("cuda"),
                                               attention_mask=attention_mask,
                                               predict_indices=None)['embeddings'][:,0,:]
 
