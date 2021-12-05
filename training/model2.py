@@ -328,8 +328,7 @@ class ShibaForClassification(ShibaForTask):
         self.vocab_size = vocab_size
         self.config = self.shiba_model.config
         self.config.vocab_size = self.vocab_size
-        self.label_layer = torch.nn.Linear(100, self.vocab_size)
-        self.label_layer2 = torch.nn.Linear(self.shiba_model.config.hidden_size, 100)
+        self.label_layer = torch.nn.Linear(self.shiba_model.config.hidden_size, self.vocab_size)
         self.dropout = torch.nn.Dropout(p=self.shiba_model.config.dropout)
 
         self.log_softmax = torch.nn.LogSoftmax(dim=1)
@@ -341,16 +340,17 @@ class ShibaForClassification(ShibaForTask):
                 labels: Optional[torch.Tensor],
                 attention_mask: torch.Tensor) -> Tuple:
         with torch.no_grad():
-            cls_embeddings = self.shiba_model(input_ids=input_ids,
+            emb = self.shiba_model(input_ids=input_ids,
                                               segment_ids=segment_ids,
                                               attention_mask=attention_mask,
-                                              predict_indices=None)['embeddings'][:, 10, :]
+                                              predict_indices=None)['embeddings']
 
-        cls_embeddings = self.label_layer2(cls_embeddings)
-        cls_embeddings=torch.nn.functional.relu(cls_embeddings)
-        class_hidden_states = self.label_layer(cls_embeddings)
-        #class_probs = self.log_softmax(class_hidden_states)
-        class_probs = torch.nn.functional.log_softmax(class_hidden_states, dim=-1)  # tester ca mais je crois que log_spftmax marche mieux de maniere generale
+            a = ((segment_ids == 2).nonzero(as_tuple=True)[0])[0].item()
+            cls_embeddings1 = emb[:, 0, :]
+            cls_embeddings2 = emb[:, a, :]
+
+        class_hidden_states = self.label_layer(torch.cat([cls_embeddings1, cls_embeddings2]))
+        class_probs = self.log_softmax(class_hidden_states)
 
         output = {
             'cls_embeddings': cls_embeddings,
