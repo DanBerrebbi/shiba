@@ -50,11 +50,13 @@ def main():
         premise_ids = tokenizer.encode(example['premise'])['input_ids']
         hypothesis_ids = tokenizer.encode(example['hypothesis'])['input_ids']
         input_ids = torch.cat([premise_ids, torch.tensor([tokenizer.SEP]), hypothesis_ids])
-        segment_ids = [torch.ones_like(premise_ids), torch.ones_like(hypothesis_ids) * 2]
+        segment_ids = torch.cat([torch.ones_like(premise_ids),
+                                 torch.tensor([0]),
+                                 torch.ones_like(hypothesis_ids) * 2])
 
 
         return {
-            'input_ids': [premise_ids[:model.config.max_length],hypothesis_ids[:model.config.max_length]] ,
+            'input_ids': input_ids[:model.config.max_length],
             'segment_ids': segment_ids[:model.config.max_length],
             'labels': example['label']
         }
