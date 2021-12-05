@@ -353,7 +353,7 @@ class ShibaForClassification(ShibaForTask):
         class_probs = self.log_softmax(class_hidden_states)
 
         output = {
-            'cls_embeddings': cls_embeddings,
+            'cls_embeddings': torch.cat([cls_embeddings1, cls_embeddings2]),
             'class_probs': class_probs
         }
 
