@@ -9,8 +9,8 @@ python3 train_xnli.py \
 --save_strategy steps \
 --eval_steps 100 \
 --save_steps 5000 \
---learning_rate  0.0000001 \
+--learning_rate  0.0001 \
 --adam_beta2 0.98 \
 --adam_epsilon 1e-06 \
 --dropout 0.1 \
-#--resume_from_checkpoint "/projects/tir5/users/dberrebb/CANINE/forked_shiba/shiba/training/models/${model}/checkpoint-10000/pytorch_model.bin"
+--resume_from_checkpoint "/projects/tir5/users/dberrebb/CANINE/forked_shiba/shiba/training/models/${model}/checkpoint-10000/pytorch_model.bin"
