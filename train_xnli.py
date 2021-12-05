@@ -80,7 +80,7 @@ def main():
     trainer = Trainer(model=model,
                       args=training_args,
                       data_collator=data_collator,
-                      train_dataset=sw_xnli_dataset['validation'].map(process_example),
+                      train_dataset=sw_xnli_dataset['train'].map(process_example),
                       eval_dataset=sw_xnli_dataset['validation'].map(process_example),
                       compute_metrics=compute_metrics
                       )
