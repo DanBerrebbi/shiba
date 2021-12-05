@@ -3,7 +3,7 @@
 model="exp3"
 python3 train_xnli.py \
 --output_dir "XNLI_MODELS/${model}" \
---num_train_epochs 10
+--num_train_epochs 10 \
 --logging_steps 50 \
 --max_steps 5000 \
 --evaluation_strategy steps \
