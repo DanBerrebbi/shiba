@@ -344,7 +344,7 @@ class ShibaForClassification(ShibaForTask):
             cls_embeddings = self.shiba_model(input_ids=input_ids,
                                               segment_ids=segment_ids,
                                               attention_mask=attention_mask,
-                                              predict_indices=None)['embeddings'][:, a-1, :]
+                                              predict_indices=None)['embeddings'][:, 0, :]
 
 
         class_hidden_states = self.label_layer(cls_embeddings)

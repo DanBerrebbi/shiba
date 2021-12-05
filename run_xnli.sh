@@ -14,8 +14,8 @@ python3 train_xnli.py \
 --adam_beta2 0.98 \
 --adam_epsilon 1e-06 \
 --dropout 0.1 \
---gradient_accumulation_steps 24 \
+--gradient_accumulation_steps 10 \
 --per_device_eval_batch_size 2 \
---per_device_train_batch_size 4 \
+--per_device_train_batch_size 8 \
 --resume_from_checkpoint "/projects/tir5/users/dberrebb/CANINE/forked_shiba/shiba/training/models/${model}/checkpoint-10000/pytorch_model.bin"
 
