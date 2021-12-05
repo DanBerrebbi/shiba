@@ -54,11 +54,6 @@ def main():
                                  torch.tensor([0]),
                                  torch.ones_like(hypothesis_ids) * 2])
 
-        print({
-            'input_ids': input_ids[:model.config.max_length],
-            'segment_ids': segment_ids[:model.config.max_length],
-            'labels': example['label']
-        })
 
         return {
             'input_ids': input_ids[:model.config.max_length],
