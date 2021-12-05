@@ -328,7 +328,8 @@ class ShibaForClassification(ShibaForTask):
         self.vocab_size = vocab_size
         self.config = self.shiba_model.config
         self.config.vocab_size = self.vocab_size
-        self.label_layer = torch.nn.Linear(self.shiba_model.config.hidden_size, self.vocab_size)
+        self.label_layer = torch.nn.Linear(self.hidden_dan, self.vocab_size)
+        self.label_layer2 = torch.nn.Linear(self.shiba_model.config.hidden_size, self.hidden_dan)
         self.dropout = torch.nn.Dropout(p=self.shiba_model.config.dropout)
 
         self.log_softmax = torch.nn.LogSoftmax(dim=1)
@@ -344,7 +345,9 @@ class ShibaForClassification(ShibaForTask):
                                               segment_ids=segment_ids,
                                               attention_mask=attention_mask,
                                               predict_indices=None)['embeddings'][:, 0, :]
-        class_hidden_states = self.label_layer(cls_embeddings)
+
+        cls_embeddings = self.label_layer2(cls_embeddings)
+        class_hidden_states = self.label_layer(torch.nn.ReLU(cls_embeddings))
         #class_probs = self.log_softmax(class_hidden_states)
         class_probs = torch.nn.functional.log_softmax(class_hidden_states, dim=-1)  # tester ca mais je crois que log_spftmax marche mieux de maniere generale
 
