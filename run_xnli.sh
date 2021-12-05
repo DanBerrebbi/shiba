@@ -9,7 +9,7 @@ python3 train_xnli.py \
 --save_strategy steps \
 --eval_steps 100 \
 --save_steps 5000 \
---learning_rate  1. \
+--learning_rate  0.0001 \
 --adam_beta2 0.98 \
 --adam_epsilon 1e-06 \
 --dropout 0.1 \
