@@ -17,5 +17,5 @@ python3 train_xnli.py \
 --gradient_accumulation_steps 4 \
 --per_device_eval_batch_size 2 \
 --per_device_train_batch_size 8 \
---resume_from_checkpoint "/projects/tir5/users/dberrebb/CANINE/forked_shiba/shiba/training/models/${model}/checkpoint-10000/pytorch_model.bin"
+#--resume_from_checkpoint "/projects/tir5/users/dberrebb/CANINE/forked_shiba/shiba/training/models/${model}/checkpoint-10000/pytorch_model.bin"
 
