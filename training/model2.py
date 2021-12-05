@@ -335,19 +335,23 @@ class ShibaForClassification(ShibaForTask):
         self.loss = torch.nn.NLLLoss()
 
     def forward(self,
-                input_ids: torch.Tensor,
+                input_ids,
                 segment_ids: Optional[torch.Tensor],
                 labels: Optional[torch.Tensor],
                 attention_mask: torch.Tensor) -> Tuple:
         with torch.no_grad():
-            emb = self.shiba_model(input_ids=input_ids,
+            p,h = input_ids
+            p = p.to("cuda")
+            h = h.to("cuda")
+
+            cls_embeddings1 = self.shiba_model(input_ids=p,
                                               segment_ids=segment_ids,
                                               attention_mask=attention_mask,
-                                              predict_indices=None)['embeddings']
-
-            a = ((segment_ids == 2).nonzero(as_tuple=True)[0])[0].item()
-            cls_embeddings1 = emb[:, 0, :]
-            cls_embeddings2 = emb[:, a, :]
+                                              predict_indices=None)['embeddings'][:,0,:]
+            cls_embeddings2 = self.shiba_model(input_ids=h,
+                                              segment_ids=segment_ids,
+                                              attention_mask=attention_mask,
+                                              predict_indices=None)['embeddings'][:,0,:]
 
         class_hidden_states = self.label_layer(torch.cat([cls_embeddings1, cls_embeddings2], dim=-1))
         class_probs = self.log_softmax(class_hidden_states)

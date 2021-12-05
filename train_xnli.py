@@ -56,7 +56,7 @@ def main():
 
 
         return {
-            'input_ids': input_ids[:model.config.max_length],
+            'input_ids': [premise_ids[:model.config.max_length],hypothesis_ids[:model.config.max_length]] ,
             'segment_ids': segment_ids[:model.config.max_length],
             'labels': example['label']
         }
