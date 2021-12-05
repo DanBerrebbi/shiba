@@ -349,7 +349,7 @@ class ShibaForClassification(ShibaForTask):
             cls_embeddings1 = emb[:, 0, :]
             cls_embeddings2 = emb[:, a, :]
 
-        class_hidden_states = self.label_layer(torch.cat([cls_embeddings1, cls_embeddings2]))
+        class_hidden_states = self.label_layer(torch.cat([cls_embeddings1, cls_embeddings2], dim=-1))
         class_probs = self.log_softmax(class_hidden_states)
 
         output = {
