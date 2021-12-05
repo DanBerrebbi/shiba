@@ -328,8 +328,8 @@ class ShibaForClassification(ShibaForTask):
         self.vocab_size = vocab_size
         self.config = self.shiba_model.config
         self.config.vocab_size = self.vocab_size
-        self.label_layer = torch.nn.Linear(self.hidden_dan, self.vocab_size)
-        self.label_layer2 = torch.nn.Linear(self.shiba_model.config.hidden_size, self.hidden_dan)
+        self.label_layer = torch.nn.Linear(100, self.vocab_size)
+        self.label_layer2 = torch.nn.Linear(self.shiba_model.config.hidden_size, 100)
         self.dropout = torch.nn.Dropout(p=self.shiba_model.config.dropout)
 
         self.log_softmax = torch.nn.LogSoftmax(dim=1)
