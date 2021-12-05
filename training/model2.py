@@ -344,7 +344,7 @@ class ShibaForClassification(ShibaForTask):
             cls_embeddings = self.shiba_model(input_ids=input_ids,
                                               segment_ids=segment_ids,
                                               attention_mask=attention_mask,
-                                              predict_indices=None)['embeddings'][:, 0, :]
+                                              predict_indices=None)['embeddings'][:, 10, :]
 
         cls_embeddings = self.label_layer2(cls_embeddings)
         cls_embeddings=torch.nn.functional.relu(cls_embeddings)
