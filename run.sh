@@ -5,8 +5,8 @@ echo $masking
 
 python training/train.py \
 --data "training/all_examples.jsonl" \
---logging_steps 50 \
---max_steps 20000 \
+--logging_steps 100 \
+--max_steps 10000 \
 --evaluation_strategy steps \
 --save_strategy steps \
 --eval_steps 500 \
@@ -16,13 +16,13 @@ python training/train.py \
 --adam_epsilon 1e-06 \
 --dropout 0.1 \
 --weight_decay 0.01  \
---output_dir "training/models/exp_simclr_alpha0.8_bs4_acc8" \
+--output_dir "training/models/exp_simclr_alpha0.5_bs6_acc15_ngpu4" \
 --overwrite_output_dir False \
 --masking_type rand_span \
---gradient_accumulation_steps 8 \
+--gradient_accumulation_steps 15 \
 --masking_type $masking \
 --deep_transformer_stack_layers 12 \
 --per_device_eval_batch_size 2 \
---per_device_train_batch_size 4 \
+--per_device_train_batch_size 6 \
 #--resume_from_checkpoint "/projects/tir5/users/dberrebb/CANINE/forked_shiba/shiba/training/models/first_rand_span/checkpoint-1500" \
 
