@@ -493,7 +493,7 @@ class ShibaForAutoregressiveLanguageModelingContrastive(ShibaForMaskedLanguageMo
 
         contrast_loss = self.contrastive_loss(embs1.reshape(bs, -1),embs2.reshape(bs, -1), y)
         alpha = 0.5
-        beta=0.2
+
         return alpha*(0.5*(loss1+loss2)) + (1-alpha)*contrast_loss, 0.5*(char1+char2), 0.5*(embs1+embs2)
         #return loss1 + beta*LA.norm(embs1), char1, embs1
 

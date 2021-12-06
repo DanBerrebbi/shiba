@@ -9,7 +9,7 @@ from helpers import MAX_JP_CODEPOINT, DataArguments, prepare_data, \
 from masking import RandomSpanMaskingDataCollator, RandomMaskingDataCollator, RandomSpanMaskingDataCollatorContrastive
 import model2 as m
 from model2 import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer, ShibaForAutoregressiveLanguageModelingContrastive
-from model3 import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer, ShibaForAutoregressiveLanguageModelingContrastive
+#from model3 import ShibaForAutoregressiveLanguageModeling, CodepointTokenizer, ShibaForAutoregressiveLanguageModelingContrastive
 from torch import nn
 import torch.nn.functional as F
 
